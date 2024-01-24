@@ -1,0 +1,138 @@
+
+--What is the total amount each customer spent at the restaurant?
+use bar
+select sales.customer_id
+,sum(menu.price) as Total
+from sales
+inner join menu on sales.product_id=menu.product_id
+group by sales.customer_id
+
+--How many days has each customer visited the restaurant?
+select sales.customer_id,count(distinct order_date) as Number_days
+from sales
+group by sales.customer_id
+
+---What was the first item from the menu purchased by each customer?
+with cte as (select *,rank()over(partition by customer_id order by order_date) as rnk
+from sales)
+
+select cte.customer_id
+,menu.product_name
+from cte
+inner join menu on cte.product_id=menu.product_id
+where cte.rnk=1
+
+---What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+with cte as (select sales.product_id ,count(*) as cnt
+from sales
+group by sales.product_id)
+select menu.product_name,cte.cnt
+from cte
+inner join menu on cte.product_id=menu.product_id
+where cte.cnt in (select max(cte.cnt) from cte)
+
+--Which item was the most popular for each customer?
+with cte as (select customer_id 
+, product_id
+,count(*)over(partition by customer_id,product_id) as cnt
+from sales),
+cte1 as (select *,(rank()over (partition by cte.customer_id order by cnt)) as rnk
+from cte)
+
+select distinct cte1.customer_id
+, menu.product_name
+from cte1
+inner join menu on cte1.product_id=menu.product_id
+where cte1.rnk=1
+
+
+--Which item was purchased first by the customer after they became a member?
+
+with cte as (select sales.customer_id
+,sales.order_date
+,sales.product_id
+,rank()over(partition by sales.customer_id order by sales.order_date) as rnk
+from sales 
+inner join members on sales.customer_id=members.customer_id
+where sales.order_date >= members.join_date)
+
+select cte.customer_id ,
+menu.product_name
+from cte
+inner join menu on menu.product_id=cte.product_id
+where rnk=1
+
+--Which item was purchased just before the customer became a member?
+
+with cte as (select sales.customer_id
+,sales.order_date
+,sales.product_id
+,rank()over(partition by sales.customer_id order by sales.order_date desc) as rnk
+from sales 
+inner join members on sales.customer_id=members.customer_id
+where sales.order_date < members.join_date)
+
+select cte.customer_id ,
+menu.product_name
+from cte
+inner join menu on menu.product_id=cte.product_id
+where rnk=1
+
+--What is the total items and amount spent for each member before they became a member?
+with cte as (select sales.customer_id
+,sales.order_date
+,sales.product_id
+from sales 
+inner join members on sales.customer_id=members.customer_id
+where sales.order_date < members.join_date)
+
+select cte.customer_id
+,count(*) as total_items
+,sum(menu.price) as price
+from cte 
+inner join menu on cte.product_id=menu.product_id
+group by cte.customer_id
+
+--If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+
+with cte as (select sales.customer_id,menu.price
+,(case when sales.product_id=1 then 20
+when sales.product_id=2 or sales.product_id=3 then 10 end) as cnt
+--,sum(menu.price*cnt) as Total
+from sales
+inner join menu on sales.product_id=menu.product_id)
+--group by sales.customer_id
+
+select cte.customer_id
+,sum(price*cnt)
+from cte
+group by cte.customer_id
+
+--In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+
+with cte AS (
+        SELECT
+            sales.customer_id,
+            sales.order_date,
+            members.join_date,
+            menu.product_name,
+            menu.price,
+            CASE WHEN sales.order_date >= members.join_date
+                  AND day(sales.order_date) < day(members.join_date) + 7 THEN 2*menu.price
+                 
+            ELSE menu.price END AS points
+        FROM sales 
+        LEFT JOIN menu
+            ON sales.product_id = menu.product_id
+        INNER JOIN members
+            ON sales.customer_id = members.customer_id
+    )
+    
+    SELECT
+        customer_id,
+        SUM(points) as Points
+    FROM cte
+    WHERE order_date <= '2021-01-31'
+    GROUP BY customer_id
+    ORDER BY customer_id;
