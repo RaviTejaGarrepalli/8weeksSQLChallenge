@@ -1,0 +1,58 @@
+DML Script:
+DROP TABLE IF EXISTS Company;
+
+
+
+CREATE TABLE Company (
+
+    id INT PRIMARY KEY,
+
+    name VARCHAR(255)
+
+);
+
+INSERT INTO Company (id, name) VALUES
+
+(1, 'Alpha Corp'),
+
+(2, 'Beta LLC'),
+
+(3, 'Gamma Inc'),
+
+(4, 'Delta Ltd'),
+
+(5, 'Epsilon Plc'),
+
+(6, 'Zeta GmbH'),
+
+(7, 'Eta SA'),
+
+(8, 'Theta Srl'),
+
+(9, 'Iota Partners'),
+
+(10, 'Kappa Co');
+
+DROP TABLE IF EXISTS Sales;
+CREATE TABLE Sales (
+
+    company_id INT,
+
+    expenses INT,
+
+    revenue INT 
+
+);
+
+insert into Sales values(1,5000,8000),(2,3000,4500),(3,7000,15000),(4,2000,3000),(5,8000,12000),(6,2500,4000),(7,4500,6500),(8,1000,1500),(9,6000,9000),(10,5500,8500)
+
+#Return companies with high profits
+Solution:
+
+select Name,Total_Profit as Profit 
+from (
+select  Company.name as Name,(Sales.revenue-Sales.expenses) as Total_Profit,row_number()over(order by Sales.revenue-Sales.expenses desc) as rnk 
+from Sales
+inner join Company on Company.id=Sales.company_id ) a 
+where rnk<=3 
+
