@@ -1,0 +1,30 @@
+Drop table if exists Exam
+create table Exam (
+Id int, English int,
+Maths int, Science int,
+Geography int,History int,
+Sanskrit int)
+
+Insert into Exam Values (1,85,99,92,86,86,99)
+Insert into Exam Values (2,81,82,83,86,95,96)
+Insert into Exam Values (3,76,55,76,76,56,76)
+Insert into Exam Values (4,84,84,84,84,84,84)
+Insert into Exam Values (5,83,99,45,88,75,90)
+
+select * from Exam
+
+
+
+Solution:
+
+select * from student_info
+with cte as (select * from (
+select ID,English,Maths,Science,Geography,History,Sanskrit
+from Exam) as p
+unpivot 
+(marks for subjects in (English,Maths,Science,Geography,History,Sanskrit)
+)as upvt)
+
+select ID,AVG(marks) as Average_marks from (select *,rank()over(partition by ID order by marks desc) as rnk from cte ) a 
+where rnk <=5
+group by ID
