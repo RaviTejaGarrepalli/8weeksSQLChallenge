@@ -1,0 +1,32 @@
+
+
+#DML Scripts
+Drop table if exists products
+CREATE TABLE Products
+(
+Product    VARCHAR(100),
+Quantity            INTEGER NOT NULL
+) 
+
+INSERT INTO Products
+VALUES
+('Mobile',3),
+('TV',5),
+('Tablet',4)
+
+
+select * from products
+#Question: Ungroup the data
+
+--#Solution:
+with cte as (
+
+select product,Quantity
+from products
+union all
+select product,Quantity-1
+from cte 
+where Quantity >=1)
+
+select * from cte
+where Quantity >=1
