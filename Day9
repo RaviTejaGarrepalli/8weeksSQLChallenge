@@ -1,0 +1,33 @@
+
+#DML Scripts
+Drop Table if exists Sales
+create table Sales (
+    Product varchar(10),
+    Region varchar(10),
+    Sales int
+);
+
+insert into Sales values
+('A', 'North', 2000),
+('A', 'South', 3000),
+('A', 'East', 2400),
+('B', 'North', 5000),
+('B', 'South', 1000),
+('B', 'East', 6000),
+('C', 'North', 2500),
+('C', 'South', 300),
+('C', 'East', 4800),
+('D', 'North', 1500),
+('D', 'South', 2480),
+('D', 'East', 2680);
+
+select * from sales
+#Qustion: Unpivot the table data
+#Solution:
+
+select Product,[North],[South],[East]
+from (
+select product,region,sales
+from sales) as Source
+pivot
+(Max(sales) for region in ([North],[South],[East])) as Pvt
