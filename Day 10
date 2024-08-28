@@ -1,0 +1,36 @@
+
+
+
+#DML Scripts:
+CREATE TABLE travel_data (
+ customer VARCHAR(10),
+ start_loc VARCHAR(50),
+ end_loc VARCHAR(50)
+);
+
+INSERT INTO travel_data (customer, start_loc, end_loc) VALUES
+ ('c1', 'New York', 'Lima'),
+ ('c1', 'London', 'New York'),
+ ('c1', 'Lima', 'Sao Paulo'),
+ ('c1', 'Sao Paulo', 'New Delhi'),
+ ('c2', 'Mumbai', 'Hyderabad'),
+ ('c2', 'Surat', 'Pune'),
+ ('c2', 'Hyderabad', 'Surat'),
+ ('c3', 'Kochi', 'Kurnool'),
+ ('c3', 'Lucknow', 'Agra'),
+ ('c3', 'Agra', 'Jaipur'),
+ ('c3', 'Jaipur', 'Kochi');
+
+
+#Solution:
+ with cte as (
+select customer,start_loc from travel_data dt where start_loc not in  (select end_loc from travel_data where customer = dt.customer)),
+
+cte2 as ( select customer,end_loc as final_loc from travel_data td1 where end_loc not in (select start_loc from travel_data where customer = td1.customer)),
+
+
+cte3 as ( select customer, count(*)+1 as Total_visited from travel_data group by customer)
+
+select c1.customer,c1.start_loc ,c2.final_loc, c3.Total_visited from cte c1
+join cte2 c2 on c1.customer=c2.customer
+join cte3 c3 on c1.customer=c3.customer
