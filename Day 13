@@ -1,0 +1,25 @@
+
+#Question:https://www.youtube.com/watch?v=Sq1kM3jVU68
+#DML Scripts:
+CREATE TABLE seats (
+    id INT,
+    student VARCHAR(10)
+);
+
+INSERT INTO seats VALUES 
+(1, 'Amit'),
+(2, 'Deepa'),
+(3, 'Rohit'),
+(4, 'Anjali'),
+(5, 'Neha'),
+(6, 'Sanjay'),
+(7, 'Priya');
+
+
+#Solution:
+select 
+(case when id=(select max(id) from seats) and id %2=1 then id
+when id%2=0 then lag(id,1,id)over(order by id)
+else lead(id,1)over(order by id) END) as New_id,student
+from seats
+order by New_id
