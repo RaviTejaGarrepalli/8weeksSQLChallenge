@@ -1,0 +1,17 @@
+
+
+DML Scripts:
+create table Alphabetwords(letter_word varchar(10))
+
+insert into Alphabetwords values ('D'),('A'), ('B'), ('C'), ('E'),  ('Elephant'),('Apple'),('Cat'), ('Donkey'), ('Ball')
+
+
+#Solution:
+with cte as (
+select letter_word,SUBSTRING(letter_word,1,1) as Single_Letter from Alphabetwords Aw )
+
+
+select Aw.letter_word,cte.letter_word
+from Alphabetwords AW left join  cte on cte.Single_Letter=AW.letter_word
+where AW.letter_word <> cte.letter_word
+order by AW.letter_word
