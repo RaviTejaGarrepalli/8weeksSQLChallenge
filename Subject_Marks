@@ -1,0 +1,78 @@
+
+
+#DML:
+DROP TABLE IF EXISTS Grades
+
+CREATE TABLE Grades (
+
+    Subject VARCHAR(50),
+
+    Score INT
+
+);
+
+INSERT INTO Grades (Subject, Score) VALUES
+
+('Math', 95),
+
+('Science', 88),
+
+('History', 92),
+
+('English', 85),
+
+('Geography', 90),
+
+('Biology', 87),
+
+('Chemistry', 91),
+
+('Physics', 89),
+
+('Social',95)
+
+
+
+DROP TABLE IF EXISTS SubjectMapping
+
+
+
+CREATE TABLE SubjectMapping (
+
+    OriginalSubject VARCHAR(50),
+
+    MappedSubject VARCHAR(50),
+
+    Weight DECIMAL(5, 2)
+
+);
+
+
+
+INSERT INTO SubjectMapping (OriginalSubject, MappedSubject, Weight) VALUES
+
+('Biology', 'Science', 0.33),
+
+('Chemistry', 'Science', 0.33),
+
+('Physics', 'Science', 0.34),
+
+('Geography', 'Social', 0.5),
+
+('History', 'Social', 0.5);
+
+
+
+
+#Solution:
+with cte as (SELECT G.Subject,G.Score,G.Score*SM.Weight as Value  FROM Grades G
+inner join SubjectMapping SM on SM.OriginalSubject=G.Subject
+where G.Subject='Biology' or G.Subject='Chemistry' or G.Subject='Physics')
+
+select 'Science' as Subject,sum(Value) as Score from cte
+union all
+select * from grades
+where Subject not in ('Biology','Chemistry' ,'Physics')
+
+SELECT * FROM SubjectMapping
+select * from grades
