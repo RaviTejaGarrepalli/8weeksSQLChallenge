@@ -1,0 +1,32 @@
+
+#DML:
+drop table if exists workspace;
+
+create table workspace (workspaceId int, FolderPath varchar(max));
+
+insert into workspace values (1,'a\b\c')
+
+insert into workspace values (1,'a\d')
+
+insert into workspace values (1,'a\e')
+
+insert into workspace values (1,'a\b\a')
+
+insert into workspace values (1,'a\a\a')
+
+insert into workspace values (1,'b')
+
+insert into workspace values (1,'c')
+
+insert into workspace values (1,'c\d\e')
+
+insert into workspace values (1,'a\b\c\d')
+
+
+#Solution:
+with cte as (select FolderPath,ROW_NUMBER()over(order by FolderPath) as rn from workspace)
+
+select FolderPath,count(value) as Value
+from cte
+cross apply string_split(FolderPath,'\')
+group by FolderPath
