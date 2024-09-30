@@ -1,0 +1,28 @@
+# DML Scripts:
+DROP TABLE IF EXISTS SequenceNumbers;
+
+CREATE TABLE dbo.SequenceNumbers
+(
+	[ID] INT,
+	[Number] INT
+)
+
+INSERT INTO SequenceNumbers
+VALUES
+(1,20),(2,20),(3,20),(4,20),(5,22),(6,24),(7,24),(8,24),(9,20)
+
+SELECT * FROM SequenceNumbers
+
+#DML Solutions:
+
+--Return the Numbers which appeared more than 2 times conseuctively
+
+with cte as (
+SELECT *,row_number()over(partition by Number order by ID) as rn from SequenceNumbers),
+cte1 as (select ID,Number,ID-rn as Group_Number
+from cte)
+
+select Number
+from cte1
+group by Number,Group_Number
+having count(*)>2
