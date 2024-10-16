@@ -1,0 +1,21 @@
+
+
+
+#DMl
+DROP TABLE IF EXISTS Customers;
+
+CREATE TABLE Customers
+(
+    [Name] varchar(100),
+    [PurchaseDetails] nvarchar(max)
+);
+
+INSERT INTO Customers
+VALUES 
+('Bob', '[{"Month": "January", "Amount": "1000"}]'),
+('Alice', '[{"Month":"January","Amount":"2000"},{"Month":"February","Amount":"500"},{"Month":"March","Amount":"2000"}]');
+
+
+#Solution
+select Name,Month,Amount from Customers
+cross apply  OPENJSON(PurchaseDetails) with (Month varchar(50),Amount INT) as my_json_array
