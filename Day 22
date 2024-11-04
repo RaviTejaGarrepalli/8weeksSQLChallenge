@@ -1,0 +1,30 @@
+#https://www.youtube.com/watch?v=gnEvMO0R8_k
+#DML Scripts:
+CREATE TABLE Flight_raw (
+    Airlines_Name VARCHAR(512)
+);
+
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('Indigo');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('Indigo');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('Jet Airways');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('Vistara');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('Spicejet');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('Spicejet');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('United Airlines');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('United Airlines');
+INSERT INTO Flight_raw (Airlines_Name) VALUES ('United Airlines');
+
+#Solution:
+with cte as (select *,(case when count(*)=1 then Null
+else count(*) END )  as Cnt from Flight_raw
+group by Airlines_Name)
+
+select 
+Airlines_Name,'REP'+cast(row_number()over(order by cnt) as varchar) as rnk
+from cte 
+where cnt is not null
+union 
+select 
+Airlines_Name,'Null'  as rnk
+from cte 
+where cnt is null
