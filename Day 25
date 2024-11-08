@@ -1,0 +1,24 @@
+
+
+
+Question: https://www.youtube.com/watch?v=3ThSv8nHLsE
+#DML Scripts
+
+CREATE TABLE New_Student (
+    Name VARCHAR(512),
+    [Joining Date] nvarchar(max)
+);
+
+INSERT INTO New_Student (Name, [Joining Date] ) VALUES ('Roy', '21-09-2024');
+INSERT INTO New_Student (Name, [Joining Date] ) VALUES ('Jordan', '22-09-2024');
+INSERT INTO New_Student (Name, [Joining Date] ) VALUES ('Manish', '23-09-2024');
+INSERT INTO New_Student (Name, [Joining Date] ) VALUES ('Pooja', '22-09-2024');
+INSERT INTO New_Student (Name, [Joining Date] ) VALUES ('Shivani', '23-09-2024');
+INSERT INTO New_Student (Name, [Joining Date] ) VALUES ('Kiran', '23-09-2024');
+INSERT INTO New_Student (Name, [Joining Date] ) VALUES ('Harry', '22-09-2024');
+
+
+#Solution
+select [Joining Date],string_agg(Name,' | ') as Group_Name  from New_Student
+group  by [Joining Date]
+having count([Joining Date])>1
