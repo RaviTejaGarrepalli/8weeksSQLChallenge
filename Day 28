@@ -1,0 +1,17 @@
+
+
+#Youtube: https://www.youtube.com/watch?v=7J-KzCH5aAM
+create table tags(id int, tag varchar(20))
+insert into tags values (1, '#200#100#100#300')
+insert into tags values (2, '#200#200#300#400')
+
+
+#Solution
+with cte as (select id,value from tags
+cross apply string_split(tag,'#'))
+select id,value,count(*) as total_count from cte
+where value != ' '
+group by id,value
+
+
+
