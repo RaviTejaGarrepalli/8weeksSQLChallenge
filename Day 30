@@ -1,0 +1,35 @@
+#Question: https://www.youtube.com/watch?v=Vle2Udfdg1g&t=37s
+
+#DML:
+CREATE TABLE service_log (
+ service_name NVARCHAR(50),
+ updated_time DATETIME,
+ status NVARCHAR(10)
+);
+
+INSERT INTO service_log (service_name, updated_time, status)
+VALUES
+('hdfs', '2024-03-06 10:00:00', 'up'),
+('hdfs', '2024-03-06 10:01:00', 'up'),
+('hdfs', '2024-03-06 10:02:00', 'down'),
+('hdfs', '2024-03-06 10:03:00', 'down'),
+('hdfs', '2024-03-06 10:04:00', 'down'),
+('hdfs', '2024-03-06 10:05:00', 'down'),
+('hdfs', '2024-03-06 10:06:00', 'down'),
+('hdfs', '2024-03-06 10:07:00', 'up'),
+('hdfs', '2024-03-06 10:08:00', 'up'),
+('hdfs', '2024-03-06 10:09:00', 'down'),
+('hdfs', '2024-03-06 10:10:00', 'down');
+
+#Solution:
+with cte as (select *,row_number()over(order by updated_time ) as rn from service_log),
+
+cte1 as ( select *,rn-row_number()over(partition by status order by rn) as rnn
+from cte
+where status='down')
+
+select service_name,status,start_,end_ 
+from (select service_name,status,first_value(updated_time)over(partition by service_name,status,rnn order by updated_time) as start_,first_VALUE(updated_time)over(partition by service_name,status,rnn order by updated_time desc) as end_
+from cte1) a
+group by service_name,status,start_,end_
+having count(*)>=5
